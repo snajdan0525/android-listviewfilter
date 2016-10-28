@@ -1,6 +1,7 @@
 package com.snalopainen.android_listview_filter;
 
 import android.content.Context;
+import android.graphics.Canvas;
 import android.util.AttributeSet;
 import android.util.MonthDisplayHelper;
 import android.view.View;
@@ -21,6 +22,7 @@ public class PinnedHeaderListView extends ListView implements OnScrollListener {
 	private Context mContext;
 	private View mCurrentPinnedHeaderView;// pinned header view
 	private OnScrollListener mOnScrollListener;
+	private float mHeaderOffset;
 
 	public PinnedHeaderListView(Context context) {
 		super(context);
@@ -52,7 +54,30 @@ public class PinnedHeaderListView extends ListView implements OnScrollListener {
 			mOnScrollListener.onScroll(view, firstVisibleItem,
 					visibleItemCount, totalItemCount);
 		}
-
+		mHeaderOffset = 0;
+		if (firstVisibleItem < getHeaderViewsCount()) {
+			for (int i = 0; i < firstVisibleItem + visibleItemCount; i++) {
+				View header = getChildAt(i);
+				if (header != null) {
+					header.setVisibility(View.VISIBLE);
+				}
+			}
+		}
+		firstVisibleItem -= getHeaderViewsCount();
+		invalidate();
 	}
 
+	@Override
+	protected void dispatchDraw(Canvas canvas) {
+		super.dispatchDraw(canvas);
+		if (mCurrentPinnedHeaderView == null) {
+			return;
+		}
+		int saveCount = canvas.save();
+		canvas.translate(0, mHeaderOffset);
+		canvas.clipRect(0, 0, mCurrentPinnedHeaderView.getWidth(),
+				mCurrentPinnedHeaderView.getMeasuredHeight());
+		mCurrentPinnedHeaderView.draw(canvas);
+		canvas.restoreToCount(saveCount);
+	}
 }
