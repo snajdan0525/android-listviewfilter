@@ -5,6 +5,7 @@ import android.graphics.Canvas;
 import android.util.AttributeSet;
 import android.util.MonthDisplayHelper;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.ListView;
 import android.widget.AbsListView.OnScrollListener;
@@ -23,6 +24,18 @@ public class PinnedHeaderListView extends ListView implements OnScrollListener {
 	private View mCurrentPinnedHeaderView;// pinned header view
 	private OnScrollListener mOnScrollListener;
 	private float mHeaderOffset;
+	private PinnedListViewAdapter mAdapter;
+
+	public static interface PinnedSectionedHeaderAdapter {
+		public boolean isSectionHeader(int position);
+
+		public int getSectionForPosition(int position);
+
+		public int getSectionHeaderViewType(int section);
+
+		public int getCount();
+
+	}
 
 	public PinnedHeaderListView(Context context) {
 		super(context);
@@ -64,8 +77,26 @@ public class PinnedHeaderListView extends ListView implements OnScrollListener {
 			}
 		}
 		firstVisibleItem -= getHeaderViewsCount();
+		int section = mAdapter.getSectionForPosition(firstVisibleItem);
+		int viewType = HEADER_VIEW_TYPE;
+		mCurrentPinnedHeaderView = mAdapter.getView(section,mCurrentHeaderViewType != viewType ? null : mCurrentPinnedHeaderView, this);
+		mCurrentHeaderViewType = viewType;
+		mHeaderOffset = 0.0f;
+
+		for (int i = firstVisibleItem; i < firstVisibleItem + visibleItemCount; i++) {
+			if( mAdapter.isSectionHeader(i)){
+				View headerView = getChildAt(i-firstVisibleItem);
+				float headerTop = headerView.getTop();
+				float pinnedHeaderHeight = mCurrentPinnedHeaderView.getMeasuredHeight();
+				headerView.setVisibility(View.VISIBLE);
+			}
+		}
+		
 		invalidate();
 	}
+
+	private int mCurrentHeaderViewType = 0;
+	private static int HEADER_VIEW_TYPE = 0;
 
 	@Override
 	protected void dispatchDraw(Canvas canvas) {
@@ -79,5 +110,11 @@ public class PinnedHeaderListView extends ListView implements OnScrollListener {
 				mCurrentPinnedHeaderView.getMeasuredHeight());
 		mCurrentPinnedHeaderView.draw(canvas);
 		canvas.restoreToCount(saveCount);
+	}
+
+	private int mCurrentSection = 0;
+
+	private View getSectionHeaderView(int section, View oldView) {
+		return null;
 	}
 }
