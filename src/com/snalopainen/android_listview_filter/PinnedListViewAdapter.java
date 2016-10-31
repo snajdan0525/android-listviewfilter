@@ -9,6 +9,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.ListAdapter;
 import android.widget.TextView;
 
 public class PinnedListViewAdapter extends BaseAdapter implements
@@ -51,7 +52,11 @@ public class PinnedListViewAdapter extends BaseAdapter implements
 	public int getItemViewType(int position) {
 		return mListSectionPos.contains(position) ? TYPE_SECTION : TYPE_ITEM;
 	}
-
+	@Override
+	public int getViewTypeCount() {
+		// TODO Auto-generated method stub
+		return 2;
+	}
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
 		ViewHolder holder = null;
@@ -90,9 +95,11 @@ public class PinnedListViewAdapter extends BaseAdapter implements
 
 	@Override
 	public int getSectionForPosition(int position) {
-		Integer sectionPos = mListSectionPos.get(position);
-		if (sectionPos != null)
+		if( mListSectionPos.contains(position))
+		{
+			Integer sectionPos = mListSectionPos.get(mListSectionPos.indexOf(position));
 			return sectionPos;
+		}
 		for( int index = 0 ; index< mListSectionPos.size() ; index++){
 			int sectionStart = mListSectionPos.get(index);
 			int sectionEnd = mListSectionPos.get(index+1);

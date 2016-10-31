@@ -9,8 +9,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.View.MeasureSpec;
 import android.widget.AbsListView;
+import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.AbsListView.OnScrollListener;
+import android.widget.Toast;
 
 /*
  * @author: snalopainen
@@ -27,8 +29,9 @@ public class PinnedHeaderListView extends ListView implements OnScrollListener {
 	private OnScrollListener mOnScrollListener;
 	private float mHeaderOffset;
 	private PinnedListViewAdapter mAdapter;
-    private int mWidthMode;
-    private int mHeightMode;
+	private int mWidthMode;
+	private int mHeightMode;
+
 	public static interface PinnedSectionedHeaderAdapter {
 		public boolean isSectionHeader(int position);
 
@@ -43,17 +46,18 @@ public class PinnedHeaderListView extends ListView implements OnScrollListener {
 	public PinnedHeaderListView(Context context) {
 		super(context);
 		this.mContext = context;
+		super.setOnScrollListener(this);
 	}
 
 	public PinnedHeaderListView(Context context, AttributeSet attrs) {
 		super(context, attrs);
-		this.mContext = context;
+		super.setOnScrollListener(this);
 	}
 
 	public PinnedHeaderListView(Context context, AttributeSet attrs,
 			int defStyle) {
 		super(context, attrs, defStyle);
-		this.mContext = context;
+		super.setOnScrollListener(this);
 	}
 
 	@Override
@@ -71,36 +75,43 @@ public class PinnedHeaderListView extends ListView implements OnScrollListener {
 					visibleItemCount, totalItemCount);
 		}
 		mHeaderOffset = 0;
-		if (firstVisibleItem < getHeaderViewsCount()) {
+		if (mAdapter==null || mAdapter.getCount() == 0 || firstVisibleItem < getHeaderViewsCount()) {
+			mCurrentPinnedHeaderView=null;
 			for (int i = 0; i < firstVisibleItem + visibleItemCount; i++) {
 				View header = getChildAt(i);
 				if (header != null) {
 					header.setVisibility(View.VISIBLE);
 				}
 			}
+			return;
 		}
+		Log.i("firstVisibleItem", "firstVisibleItem:" + firstVisibleItem);
 		firstVisibleItem -= getHeaderViewsCount();
+		Log.i("firstVisibleItem", "firstVisibleItem:" + firstVisibleItem);
 		int section = mAdapter.getSectionForPosition(firstVisibleItem);
 		int viewType = HEADER_VIEW_TYPE;
-		mCurrentPinnedHeaderView = mAdapter.getView(section,mCurrentHeaderViewType != viewType ? null : mCurrentPinnedHeaderView, this);
+		mCurrentPinnedHeaderView = mAdapter.getView(section,
+				mCurrentHeaderViewType != viewType ? null
+						: mCurrentPinnedHeaderView, this);
 		mCurrentHeaderViewType = viewType;
 		ensurePinnedHeaderLayout(mCurrentPinnedHeaderView);
 		mHeaderOffset = 0.0f;
 
 		for (int i = firstVisibleItem; i < firstVisibleItem + visibleItemCount; i++) {
-			if( mAdapter.isSectionHeader(i)){
-				View headerView = getChildAt(i-firstVisibleItem);
+			if (mAdapter.isSectionHeader(i)) {
+				View headerView = getChildAt(i - firstVisibleItem);
 				float headerTop = headerView.getTop();
-				float pinnedHeaderHeight = mCurrentPinnedHeaderView.getMeasuredHeight();
+				float pinnedHeaderHeight = mCurrentPinnedHeaderView
+						.getMeasuredHeight();
 				headerView.setVisibility(View.VISIBLE);
 				if (pinnedHeaderHeight >= headerTop && headerTop > 0) {
-					mHeaderOffset = headerTop-headerView.getHeight();
+					mHeaderOffset = headerTop - headerView.getHeight();
 				} else if (headerTop <= 0) {
 					headerView.setVisibility(View.INVISIBLE);
 				}
 			}
 		}
-		
+
 		invalidate();
 	}
 
@@ -120,31 +131,47 @@ public class PinnedHeaderListView extends ListView implements OnScrollListener {
 		mCurrentPinnedHeaderView.draw(canvas);
 		canvas.restoreToCount(saveCount);
 	}
+
 	@Override
 	protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
 		// TODO Auto-generated method stub
 		super.onMeasure(widthMeasureSpec, heightMeasureSpec);
 		mWidthMode = MeasureSpec.getMode(widthMeasureSpec);
-        mHeightMode = MeasureSpec.getMode(heightMeasureSpec);
+		mHeightMode = MeasureSpec.getMode(heightMeasureSpec);
 	}
+
 	private int mCurrentSection = 0;
 
 	private View getSectionHeaderView(int section, View oldView) {
 		return null;
 	}
-    private void ensurePinnedHeaderLayout(View header) {
-        if (header.isLayoutRequested()) {
-            int widthSpec = MeasureSpec.makeMeasureSpec(getMeasuredWidth(), mWidthMode);//子视图的MeasureSpec
-            
-            int heightSpec;
-            ViewGroup.LayoutParams layoutParams = header.getLayoutParams();
-            if (layoutParams != null && layoutParams.height > 0) {
-                heightSpec = MeasureSpec.makeMeasureSpec(layoutParams.height, MeasureSpec.EXACTLY);
-            } else {
-                heightSpec = MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED);
-            }
-            header.measure(widthSpec, heightSpec);//设置真正的子视图大小，设置即子视图的measuredWigth , mesuredHeight
-            header.layout(0, 0, header.getMeasuredWidth(), header.getMeasuredHeight());//根据子视图的measuredHeigh和mesauredWidth设置位置
-        }
-    }
+
+	private void ensurePinnedHeaderLayout(View header) {
+		if (header.isLayoutRequested()) {
+			int widthSpec = MeasureSpec.makeMeasureSpec(getMeasuredWidth(),
+					mWidthMode);// 子视图的MeasureSpec
+
+			int heightSpec;
+			ViewGroup.LayoutParams layoutParams = header.getLayoutParams();
+			if (layoutParams != null && layoutParams.height > 0) {
+				heightSpec = MeasureSpec.makeMeasureSpec(layoutParams.height,
+						MeasureSpec.EXACTLY);
+				Log.i("BBBBB", "BBBB");
+			} else {
+				heightSpec = MeasureSpec.makeMeasureSpec(0,
+						MeasureSpec.UNSPECIFIED);
+			}
+			header.measure(widthSpec, heightSpec);// 设置真正的子视图大小，设置即子视图的measuredWigth
+													// , mesuredHeight
+			header.layout(0, 0, header.getMeasuredWidth(),
+					header.getMeasuredHeight());// 根据子视图的measuredHeigh和mesauredWidth设置位置
+		}
+	}
+
+	@Override
+	public void setAdapter(ListAdapter adapter) {
+		mCurrentPinnedHeaderView = null;
+		this.mAdapter = (PinnedListViewAdapter) adapter;
+		super.setAdapter(adapter);
+	}
 }

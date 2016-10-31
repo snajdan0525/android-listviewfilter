@@ -5,23 +5,10 @@
     android:orientation="vertical"
     tools:context=".MainActivity" >
 
-    <EditText
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="5dp"
-        android:drawableLeft="@drawable/ic_search"
-        android:hint="@string/search_hint" />
-
-    <FrameLayout
+    <com.snalopainen.android_listview_filter.PinnedHeaderListView
+        android:id="@+id/pinnedListView"
         android:layout_width="fill_parent"
-        android:layout_height="match_parent" >
-
-        <include layout="@layout/loading_empty_view" />
-
-        <ListView
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent" >
-        </ListView>
-    </FrameLayout>
+        android:layout_height="fill_parent" >
+    </com.snalopainen.android_listview_filter.PinnedHeaderListView>
 
 </LinearLayout>
