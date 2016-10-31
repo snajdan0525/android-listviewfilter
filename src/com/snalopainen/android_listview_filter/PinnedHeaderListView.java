@@ -6,6 +6,7 @@ import android.util.AttributeSet;
 import android.util.MonthDisplayHelper;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.View.MeasureSpec;
 import android.widget.AbsListView;
 import android.widget.ListView;
 import android.widget.AbsListView.OnScrollListener;
@@ -25,7 +26,8 @@ public class PinnedHeaderListView extends ListView implements OnScrollListener {
 	private OnScrollListener mOnScrollListener;
 	private float mHeaderOffset;
 	private PinnedListViewAdapter mAdapter;
-
+    private int mWidthMode;
+    private int mHeightMode;
 	public static interface PinnedSectionedHeaderAdapter {
 		public boolean isSectionHeader(int position);
 
@@ -81,6 +83,7 @@ public class PinnedHeaderListView extends ListView implements OnScrollListener {
 		int viewType = HEADER_VIEW_TYPE;
 		mCurrentPinnedHeaderView = mAdapter.getView(section,mCurrentHeaderViewType != viewType ? null : mCurrentPinnedHeaderView, this);
 		mCurrentHeaderViewType = viewType;
+		ensurePinnedHeaderLayout(mCurrentPinnedHeaderView);
 		mHeaderOffset = 0.0f;
 
 		for (int i = firstVisibleItem; i < firstVisibleItem + visibleItemCount; i++) {
@@ -116,10 +119,31 @@ public class PinnedHeaderListView extends ListView implements OnScrollListener {
 		mCurrentPinnedHeaderView.draw(canvas);
 		canvas.restoreToCount(saveCount);
 	}
-
+	@Override
+	protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+		// TODO Auto-generated method stub
+		super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+		mWidthMode = MeasureSpec.getMode(widthMeasureSpec);
+        mHeightMode = MeasureSpec.getMode(heightMeasureSpec);
+	}
 	private int mCurrentSection = 0;
 
 	private View getSectionHeaderView(int section, View oldView) {
 		return null;
 	}
+    private void ensurePinnedHeaderLayout(View header) {
+        if (header.isLayoutRequested()) {
+            int widthSpec = MeasureSpec.makeMeasureSpec(getMeasuredWidth(), mWidthMode);//子视图的MeasureSpec
+            
+            int heightSpec;
+            ViewGroup.LayoutParams layoutParams = header.getLayoutParams();
+            if (layoutParams != null && layoutParams.height > 0) {
+                heightSpec = MeasureSpec.makeMeasureSpec(layoutParams.height, MeasureSpec.EXACTLY);
+            } else {
+                heightSpec = MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED);
+            }
+            header.measure(widthSpec, heightSpec);//设置真正的子视图大小，设置即子视图的measuredWigth , mesuredHeight
+            header.layout(0, 0, header.getMeasuredWidth(), header.getMeasuredHeight());//根据子视图的measuredHeigh和mesauredWidth设置位置
+        }
+    }
 }
