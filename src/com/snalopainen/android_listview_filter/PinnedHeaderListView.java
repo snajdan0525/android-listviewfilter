@@ -3,6 +3,7 @@ package com.snalopainen.android_listview_filter;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.util.MonthDisplayHelper;
 import android.view.View;
 import android.view.ViewGroup;
@@ -93,7 +94,7 @@ public class PinnedHeaderListView extends ListView implements OnScrollListener {
 				float pinnedHeaderHeight = mCurrentPinnedHeaderView.getMeasuredHeight();
 				headerView.setVisibility(View.VISIBLE);
 				if (pinnedHeaderHeight >= headerTop && headerTop > 0) {
-					mHeaderOffset = headerTop;// may be wrong
+					mHeaderOffset = headerTop-headerView.getHeight();
 				} else if (headerTop <= 0) {
 					headerView.setVisibility(View.INVISIBLE);
 				}
