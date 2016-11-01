@@ -7,7 +7,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Locale;
 
-import com.snalopainen.android_listview_filter.R;
 import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
@@ -85,27 +84,31 @@ public class MainActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
-	    LayoutInflater inflator = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        LinearLayout header1 = (LinearLayout) inflator.inflate(R.layout.list_item, null);
-        ((TextView) header1.findViewById(R.id.textItem)).setText("HEADER 1");
-        LinearLayout header2 = (LinearLayout) inflator.inflate(R.layout.list_item, null);
-        ((TextView) header2.findViewById(R.id.textItem)).setText("HEADER 2");
-        LinearLayout footer = (LinearLayout) inflator.inflate(R.layout.list_item, null);
-        ((TextView) footer.findViewById(R.id.textItem)).setText("FOOTER");
-        
-        
-    	
-		mListView=(PinnedHeaderListView)findViewById(R.id.pinnedListView);
-		
-		IndexScrollBarView indexBarView = (IndexScrollBarView) inflator.inflate(R.layout.index_bar_view, mListView, false);
+		LayoutInflater inflator = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+		LinearLayout header1 = (LinearLayout) inflator.inflate(
+				R.layout.list_item, null);
+		((TextView) header1.findViewById(R.id.textItem)).setText("HEADER 1");
+		LinearLayout header2 = (LinearLayout) inflator.inflate(
+				R.layout.list_item, null);
+		((TextView) header2.findViewById(R.id.textItem)).setText("HEADER 2");
+		LinearLayout footer = (LinearLayout) inflator.inflate(
+				R.layout.list_item, null);
+		((TextView) footer.findViewById(R.id.textItem)).setText("FOOTER");
+
+		mListView = (PinnedHeaderListView) findViewById(R.id.pinnedListView);
+
+		IndexScrollBarView indexBarView = (IndexScrollBarView) inflator
+				.inflate(R.layout.index_bar_view, mListView, false);
+
 		mListView.setIndexScrollBarView(indexBarView);
-		
-		
+
 		mListItems = new ArrayList<String>(Arrays.asList(ITEMS));
 		mItems = new ArrayList<String>();
 		mListSectionPos = new ArrayList<Integer>();
 		getSectionPosFromWordsList(mListItems);
 		mAdaptor = new PinnedListViewAdapter(this, mItems, mListSectionPos);
+		indexBarView.setIndexScrollViewData(mListView, mItems,
+				mListSectionPos);
 		mListView.setAdapter(mAdaptor);
 	}
 
