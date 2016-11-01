@@ -92,8 +92,15 @@ public class MainActivity extends Activity {
         ((TextView) header2.findViewById(R.id.textItem)).setText("HEADER 2");
         LinearLayout footer = (LinearLayout) inflator.inflate(R.layout.list_item, null);
         ((TextView) footer.findViewById(R.id.textItem)).setText("FOOTER");
-       
+        
+        
+    	
 		mListView=(PinnedHeaderListView)findViewById(R.id.pinnedListView);
+		
+		IndexScrollBarView indexBarView = (IndexScrollBarView) inflator.inflate(R.layout.index_bar_view, mListView, false);
+		mListView.setIndexScrollBarView(indexBarView);
+		
+		
 		mListItems = new ArrayList<String>(Arrays.asList(ITEMS));
 		mItems = new ArrayList<String>();
 		mListSectionPos = new ArrayList<Integer>();

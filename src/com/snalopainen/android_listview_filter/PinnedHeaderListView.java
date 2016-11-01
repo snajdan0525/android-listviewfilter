@@ -26,11 +26,15 @@ import android.widget.Toast;
 public class PinnedHeaderListView extends ListView implements OnScrollListener {
 	private Context mContext;
 	private View mCurrentPinnedHeaderView;// pinned header view
+	private View mIndexScrollBarView;// 索引条
 	private OnScrollListener mOnScrollListener;
 	private float mHeaderOffset;
 	private PinnedListViewAdapter mAdapter;
 	private int mWidthMode;
 	private int mHeightMode;
+	private int mCurrentHeaderViewType = 0;
+	private static int HEADER_VIEW_TYPE = 0;
+	private int mCurrentSection = 0;
 
 	public static interface PinnedSectionedHeaderAdapter {
 		public boolean isSectionHeader(int position);
@@ -51,12 +55,14 @@ public class PinnedHeaderListView extends ListView implements OnScrollListener {
 
 	public PinnedHeaderListView(Context context, AttributeSet attrs) {
 		super(context, attrs);
+		this.mContext = context;
 		super.setOnScrollListener(this);
 	}
 
 	public PinnedHeaderListView(Context context, AttributeSet attrs,
 			int defStyle) {
 		super(context, attrs, defStyle);
+		this.mContext = context;
 		super.setOnScrollListener(this);
 	}
 
@@ -75,8 +81,9 @@ public class PinnedHeaderListView extends ListView implements OnScrollListener {
 					visibleItemCount, totalItemCount);
 		}
 		mHeaderOffset = 0;
-		if (mAdapter==null || mAdapter.getCount() == 0 || firstVisibleItem < getHeaderViewsCount()) {
-			mCurrentPinnedHeaderView=null;
+		if (mAdapter == null || mAdapter.getCount() == 0
+				|| firstVisibleItem < getHeaderViewsCount()) {
+			mCurrentPinnedHeaderView = null;
 			for (int i = 0; i < firstVisibleItem + visibleItemCount; i++) {
 				View header = getChildAt(i);
 				if (header != null) {
@@ -113,8 +120,7 @@ public class PinnedHeaderListView extends ListView implements OnScrollListener {
 		invalidate();
 	}
 
-	private int mCurrentHeaderViewType = 0;
-	private static int HEADER_VIEW_TYPE = 0;
+	private boolean bIndexBarHasDrawn = false;
 
 	@Override
 	protected void dispatchDraw(Canvas canvas) {
@@ -128,7 +134,14 @@ public class PinnedHeaderListView extends ListView implements OnScrollListener {
 				mCurrentPinnedHeaderView.getMeasuredHeight());
 		mCurrentPinnedHeaderView.draw(canvas);
 		canvas.restoreToCount(saveCount);
+		if (mIndexScrollBarView != null) {
+			bIndexBarHasDrawn = true;
+			drawChild(canvas, mIndexScrollBarView, getDrawingTime());
+		}
 	}
+
+	private int mIndexScrollBarViewWidth;
+	private int mIndexScrollBarViewHeight;
 
 	@Override
 	protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
@@ -136,12 +149,25 @@ public class PinnedHeaderListView extends ListView implements OnScrollListener {
 		super.onMeasure(widthMeasureSpec, heightMeasureSpec);
 		mWidthMode = MeasureSpec.getMode(widthMeasureSpec);
 		mHeightMode = MeasureSpec.getMode(heightMeasureSpec);
+
+		if (mIndexScrollBarView != null && !bIndexBarHasDrawn) {
+			measureChild(mIndexScrollBarView, widthMeasureSpec,
+					heightMeasureSpec);
+			mIndexScrollBarViewWidth = mIndexScrollBarView.getMeasuredWidth();
+			mIndexScrollBarViewHeight = mIndexScrollBarView.getMeasuredHeight();
+		}
 	}
 
-	private int mCurrentSection = 0;
-
-	private View getSectionHeaderView(int section, View oldView) {
-		return null;
+	@Override
+	protected void onLayout(boolean changed, int l, int t, int r, int b) {
+		super.onLayout(changed, l, t, r, b);
+		if (mIndexScrollBarView != null && !bIndexBarHasDrawn) {
+			mIndexScrollBarView.layout(getMeasuredWidth()
+					- mIndexScrollBarViewWidth - mIndexBarViewMargin,
+					mIndexBarViewMargin, getMeasuredWidth()
+							- mIndexBarViewMargin, getMeasuredHeight()
+							- mIndexBarViewMargin);
+		}
 	}
 
 	private void ensurePinnedHeaderLayout(View header) {
@@ -171,4 +197,13 @@ public class PinnedHeaderListView extends ListView implements OnScrollListener {
 		this.mAdapter = (PinnedListViewAdapter) adapter;
 		super.setAdapter(adapter);
 	}
+
+	private int mIndexBarViewMargin;
+
+	public void setIndexScrollBarView(View indexScrollBarView) {
+		mIndexBarViewMargin = (int) mContext.getResources().getDimension(
+				R.dimen.index_bar_view_margin);
+		this.mIndexScrollBarView = indexScrollBarView;
+	}
+
 }
