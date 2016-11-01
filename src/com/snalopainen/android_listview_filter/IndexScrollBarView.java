@@ -91,19 +91,16 @@ public class IndexScrollBarView extends View {
 				String sectionText = mListItems.get(mListSection.get(section));
 				Log.i("onTouchEvent", "按下了:" + sectionText);
 				return true;
-			}
-			else
-			{
+			} else {
 				return false;
 			}
 		case MotionEvent.ACTION_MOVE:
-			if (isInTheRangeOfIndexBarView(event)){
+			if (isInTheRangeOfIndexBarView(event)) {
 				int section = fliterItems(event.getY());
 				String sectionText = mListItems.get(mListSection.get(section));
 				Log.i("onTouchEvent", "按下了:" + sectionText);
 				return true;
-			}
-			else{
+			} else {
 				return false;
 			}
 		case MotionEvent.ACTION_UP:

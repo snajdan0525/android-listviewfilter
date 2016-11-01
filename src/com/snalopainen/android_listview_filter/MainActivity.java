@@ -7,12 +7,14 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Locale;
 
+
 import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -101,14 +103,16 @@ public class MainActivity extends Activity {
 				.inflate(R.layout.index_bar_view, mListView, false);
 
 		mListView.setIndexScrollBarView(indexBarView);
+		View previewTextView = inflator.inflate(R.layout.preview_view,
+				mListView, false);
+		mListView.setPreviewView(previewTextView);
 
 		mListItems = new ArrayList<String>(Arrays.asList(ITEMS));
 		mItems = new ArrayList<String>();
 		mListSectionPos = new ArrayList<Integer>();
 		getSectionPosFromWordsList(mListItems);
 		mAdaptor = new PinnedListViewAdapter(this, mItems, mListSectionPos);
-		indexBarView.setIndexScrollViewData(mListView, mItems,
-				mListSectionPos);
+		indexBarView.setIndexScrollViewData(mListView, mItems, mListSectionPos);
 		mListView.setAdapter(mAdaptor);
 	}
 

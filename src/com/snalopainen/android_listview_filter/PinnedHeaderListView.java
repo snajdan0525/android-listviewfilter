@@ -28,6 +28,7 @@ public class PinnedHeaderListView extends ListView implements OnScrollListener {
 	private Context mContext;
 	private View mCurrentPinnedHeaderView;// pinned header view
 	private View mIndexScrollBarView;// 索引条
+	private View mPreviewView;
 	private OnScrollListener mOnScrollListener;
 	private float mHeaderOffset;
 	private PinnedListViewAdapter mAdapter;
@@ -139,10 +140,15 @@ public class PinnedHeaderListView extends ListView implements OnScrollListener {
 			bIndexBarHasDrawn = true;
 			drawChild(canvas, mIndexScrollBarView, getDrawingTime());
 		}
+		if (mPreviewView != null) {
+			drawChild(canvas, mPreviewView, getDrawingTime()); 
+		}
 	}
 
 	private int mIndexScrollBarViewWidth;
 	private int mIndexScrollBarViewHeight;
+	private int mPreviewViewWidth;
+	private int mPreviewViewHeight;
 
 	@Override
 	protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
@@ -157,6 +163,11 @@ public class PinnedHeaderListView extends ListView implements OnScrollListener {
 			mIndexScrollBarViewWidth = mIndexScrollBarView.getMeasuredWidth();
 			mIndexScrollBarViewHeight = mIndexScrollBarView.getMeasuredHeight();
 		}
+		if (mPreviewView != null) {
+			measureChild(mPreviewView, widthMeasureSpec, heightMeasureSpec);
+			mPreviewViewWidth = mPreviewView.getMeasuredWidth();
+			mPreviewViewHeight = mPreviewView.getMeasuredHeight();
+		}
 	}
 
 	@Override
@@ -168,6 +179,15 @@ public class PinnedHeaderListView extends ListView implements OnScrollListener {
 					mIndexBarViewMargin, getMeasuredWidth()
 							- mIndexBarViewMargin, getMeasuredHeight()
 							- mIndexBarViewMargin);
+		}
+		if (mPreviewView != null) {
+			mPreviewView.layout(getMeasuredWidth() - mIndexScrollBarViewWidth
+					- mIndexBarViewMargin - mPreviewViewWidth,
+					mIndexBarViewMargin + mIndexScrollBarViewHeight / 2
+							- mPreviewViewHeight / 2, getMeasuredWidth()
+							- mIndexScrollBarViewWidth - mIndexBarViewMargin,
+					mIndexBarViewMargin + mIndexScrollBarViewHeight / 2
+							+ mPreviewViewHeight / 2);
 		}
 	}
 
@@ -206,7 +226,9 @@ public class PinnedHeaderListView extends ListView implements OnScrollListener {
 				R.dimen.index_bar_view_margin);
 		this.mIndexScrollBarView = indexScrollBarView;
 	}
-
+	public void setPreviewView(View view){
+		this.mPreviewView = view;
+	}
 	@Override
 	public boolean onTouchEvent(MotionEvent ev) {
 		if (mIndexScrollBarView != null
