@@ -85,9 +85,7 @@ public class PinnedHeaderListView extends ListView implements OnScrollListener {
 			}
 			return;
 		}
-		Log.i("firstVisibleItem", "firstVisibleItem:" + firstVisibleItem);
 		firstVisibleItem -= getHeaderViewsCount();
-		Log.i("firstVisibleItem", "firstVisibleItem:" + firstVisibleItem);
 		int section = mAdapter.getSectionForPosition(firstVisibleItem);
 		int viewType = HEADER_VIEW_TYPE;
 		mCurrentPinnedHeaderView = mAdapter.getView(section,
@@ -156,7 +154,6 @@ public class PinnedHeaderListView extends ListView implements OnScrollListener {
 			if (layoutParams != null && layoutParams.height > 0) {
 				heightSpec = MeasureSpec.makeMeasureSpec(layoutParams.height,
 						MeasureSpec.EXACTLY);
-				Log.i("BBBBB", "BBBB");
 			} else {
 				heightSpec = MeasureSpec.makeMeasureSpec(0,
 						MeasureSpec.UNSPECIFIED);

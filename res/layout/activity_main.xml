@@ -7,6 +7,7 @@
 
     <com.snalopainen.android_listview_filter.PinnedHeaderListView
         android:id="@+id/pinnedListView"
+        android:scrollbars="none"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent" >
     </com.snalopainen.android_listview_filter.PinnedHeaderListView>
