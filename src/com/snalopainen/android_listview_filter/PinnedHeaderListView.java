@@ -5,6 +5,7 @@ import android.graphics.Canvas;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.util.MonthDisplayHelper;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.View.MeasureSpec;
@@ -204,6 +205,15 @@ public class PinnedHeaderListView extends ListView implements OnScrollListener {
 		mIndexBarViewMargin = (int) mContext.getResources().getDimension(
 				R.dimen.index_bar_view_margin);
 		this.mIndexScrollBarView = indexScrollBarView;
+	}
+
+	@Override
+	public boolean onTouchEvent(MotionEvent ev) {
+		if (mIndexScrollBarView != null
+				&& ((IndexScrollBarView) mIndexScrollBarView).onTouchEvent(ev)) {
+			return true;
+		}
+		return super.onTouchEvent(ev);
 	}
 
 }

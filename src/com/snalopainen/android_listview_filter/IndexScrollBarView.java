@@ -7,8 +7,10 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ListView;
+import android.widget.Toast;
 
 public class IndexScrollBarView extends View {
 	private ArrayList<String> mListItems;
@@ -50,21 +52,66 @@ public class IndexScrollBarView extends View {
 				R.dimen.index_bar_view_text_size));
 	}
 
+	private int perSectionHeight;
+
 	@Override
 	protected void onDraw(Canvas canvas) {
+
 		if (mListSection != null && mListSection.size() > 0) {
-			int perSectionHeight = (getMeasuredHeight() - 2 * mIndexBarViewMargin)
+			perSectionHeight = (getMeasuredHeight() - 2 * mIndexBarViewMargin)
 					/ mListSection.size();
-			
+
 			for (int i = 0; i < mListSection.size(); i++) {
 				int pos = mListSection.get(i);
 				String section = mListItems.get(pos);
-				Log.i("onDraw", section);
-				float paddingLeft = (getMeasuredWidth()-mIndexBarPaint.measureText(section))/2;
-				canvas.drawText(section, paddingLeft, perSectionHeight * (i+1),
-						mIndexBarPaint);
+				float paddingLeft = (getMeasuredWidth() - mIndexBarPaint
+						.measureText(section)) / 2;
+				canvas.drawText(section, paddingLeft, perSectionHeight
+						* (i + 1), mIndexBarPaint);
 			}
 		}
 		super.onDraw(canvas);
+	}
+
+	private boolean isInTheRangeOfIndexBarView(MotionEvent event) {
+		return event.getX() >= getLeft() && event.getY() >= getTop()
+				&& event.getY() <= getTop() + getMeasuredHeight();
+	}
+
+	private int fliterItems(float y) {
+		return (int) ((y - mIndexBarViewMargin) / perSectionHeight);
+	}
+
+	@Override
+	public boolean onTouchEvent(MotionEvent event) {
+		switch (event.getAction()) {
+		case MotionEvent.ACTION_DOWN:
+			if (isInTheRangeOfIndexBarView(event)) {
+				int section = fliterItems(event.getY());
+				String sectionText = mListItems.get(mListSection.get(section));
+				Log.i("onTouchEvent", "按下了:" + sectionText);
+				return true;
+			}
+			else
+			{
+				return false;
+			}
+		case MotionEvent.ACTION_MOVE:
+			if (isInTheRangeOfIndexBarView(event)){
+				int section = fliterItems(event.getY());
+				String sectionText = mListItems.get(mListSection.get(section));
+				Log.i("onTouchEvent", "按下了:" + sectionText);
+				return true;
+			}
+			else{
+				return false;
+			}
+		case MotionEvent.ACTION_UP:
+
+			break;
+		default:
+			break;
+		}
+		return false;
 	}
 }
