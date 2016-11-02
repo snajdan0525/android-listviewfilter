@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
+import android.text.SpannableStringBuilder;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -15,9 +16,9 @@ import android.widget.Toast;
 public class IndexScrollBarView extends View {
 	private ArrayList<String> mListItems;
 	private ArrayList<Integer> mListSection;
-	private ListView mListView;
+	private  PinnedHeaderListView mListView;
 	private Context mContext;
-
+	
 	public IndexScrollBarView(Context context) {
 		super(context);
 		this.mContext = context;
@@ -37,7 +38,7 @@ public class IndexScrollBarView extends View {
 	private int mIndexBarViewMargin;
 	private Paint mIndexBarPaint;
 
-	public void setIndexScrollViewData(ListView listview,
+	public void setIndexScrollViewData(PinnedHeaderListView listview,
 			ArrayList<String> listItems, ArrayList<Integer> listSection) {
 		this.mListView = listview;
 		this.mListSection = listSection;
@@ -79,7 +80,10 @@ public class IndexScrollBarView extends View {
 	}
 
 	private int fliterItems(float y) {
-		return (int) ((y - mIndexBarViewMargin) / perSectionHeight);
+		int sectionPos = (int) ((y - mIndexBarViewMargin) / perSectionHeight);
+		String sectionText = ( mListItems.get(mListSection.get(sectionPos)));
+		mListView.filterListView( mListSection.get(sectionPos) , sectionText );
+		return sectionPos;
 	}
 
 	@Override
@@ -89,7 +93,6 @@ public class IndexScrollBarView extends View {
 			if (isInTheRangeOfIndexBarView(event)) {
 				int section = fliterItems(event.getY());
 				String sectionText = mListItems.get(mListSection.get(section));
-				Log.i("onTouchEvent", "按下了:" + sectionText);
 				return true;
 			} else {
 				return false;
@@ -98,7 +101,6 @@ public class IndexScrollBarView extends View {
 			if (isInTheRangeOfIndexBarView(event)) {
 				int section = fliterItems(event.getY());
 				String sectionText = mListItems.get(mListSection.get(section));
-				Log.i("onTouchEvent", "按下了:" + sectionText);
 				return true;
 			} else {
 				return false;

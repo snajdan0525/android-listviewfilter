@@ -1,5 +1,7 @@
 package com.snalopainen.android_listview_filter;
 
+import org.w3c.dom.Text;
+
 import android.content.Context;
 import android.graphics.Canvas;
 import android.util.AttributeSet;
@@ -13,6 +15,7 @@ import android.widget.AbsListView;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.AbsListView.OnScrollListener;
+import android.widget.TextView;
 import android.widget.Toast;
 
 /*
@@ -74,7 +77,6 @@ public class PinnedHeaderListView extends ListView implements OnScrollListener {
 		if (mOnScrollListener != null)
 			mOnScrollListener.onScrollStateChanged(view, scrollState);
 	}
-
 	@Override
 	public void onScroll(AbsListView view, int firstVisibleItem,
 			int visibleItemCount, int totalItemCount) {
@@ -95,7 +97,7 @@ public class PinnedHeaderListView extends ListView implements OnScrollListener {
 			return;
 		}
 		firstVisibleItem -= getHeaderViewsCount();
-		int section = mAdapter.getSectionForPosition(firstVisibleItem);
+		int section = mCurrentSection = mAdapter.getSectionForPosition(firstVisibleItem);
 		int viewType = HEADER_VIEW_TYPE;
 		mCurrentPinnedHeaderView = mAdapter.getView(section,
 				mCurrentHeaderViewType != viewType ? null
@@ -139,8 +141,15 @@ public class PinnedHeaderListView extends ListView implements OnScrollListener {
 		if (mIndexScrollBarView != null) {
 			bIndexBarHasDrawn = true;
 			drawChild(canvas, mIndexScrollBarView, getDrawingTime());
+			Log.i("drawChild(canvas, mIndexScrollBarView, getDrawingTime());", "drawChild(canvas, mIndexScrollBarView, getDrawingTime());");
 		}
 		if (mPreviewView != null) {
+			
+			Log.i("drawChild(canvas, mPreviewView, getDrawingTime());", "drawChild(canvas, mPreviewView, getDrawingTime());");
+			Log.i("mAdapter.getItem(mCurrentSection).toString()",mAdapter.getItem(mCurrentSection).toString());
+			if( mPreviewView instanceof TextView){
+				((TextView) mPreviewView).setText(mAdapter.getItem(mCurrentSection).toString());
+			}
 			drawChild(canvas, mPreviewView, getDrawingTime()); 
 		}
 	}
@@ -237,5 +246,10 @@ public class PinnedHeaderListView extends ListView implements OnScrollListener {
 		}
 		return super.onTouchEvent(ev);
 	}
-
+	public void filterListView( int sectionPos , String text ){
+		if( mPreviewView instanceof TextView){
+			((TextView) mPreviewView).setText(text);
+		}
+		setSelection(sectionPos);
+	}
 }
