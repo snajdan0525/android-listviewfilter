@@ -5,5 +5,5 @@
     <color name="color_white">#FFFFFF</color>
     <color name="color_gray_light">#99C9C9C9</color>
     <color name="color_black_light">#99000000</color>
-    
+    <color name="primary">#4285fc</color>
 </resources>

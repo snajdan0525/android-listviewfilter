@@ -4,7 +4,14 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     tools:context=".MainActivity" >
-
+    <EditText
+        android:id="@+id/search_view"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="5dp"
+        android:drawableLeft="@drawable/ic_search"
+        android:hint="@string/search_hint"
+        android:singleLine="true" />
     <com.snalopainen.android_listview_filter.PinnedHeaderListView
         android:id="@+id/pinnedListView"
         android:scrollbars="none"

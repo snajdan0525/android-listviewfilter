@@ -13,9 +13,11 @@
     </style>
 
     <!-- Application theme. -->
-    <style name="AppTheme" parent="AppBaseTheme">
+    <style name="AppTheme" parent="android:Theme.Material">
         <!-- All customizations that are NOT specific to a particular API-level can go here. -->
         <item name="android:windowBackground">@color/color_white</item>
+        
+        <item name="android:colorPrimary">@color/primary</item>
     </style>
 
 </resources>
